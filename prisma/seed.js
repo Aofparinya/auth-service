@@ -12,6 +12,10 @@ async function main() {
     ["profile.read", "Read own profile"],
     ["customers.read", "Read customers"],
     ["customers.write", "Create and update customers"],
+    ["catalog.read", "Read catalog data"],
+    ["catalog.write", "Create and update catalog data"],
+    ["inventory.read", "Read inventory data"],
+    ["inventory.write", "Adjust inventory and manage reservations"],
   ];
 
   for (const [code, name] of permissions) {
