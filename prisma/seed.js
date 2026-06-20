@@ -10,6 +10,8 @@ async function main() {
     ["roles.read", "Read roles"],
     ["permissions.read", "Read permissions"],
     ["profile.read", "Read own profile"],
+    ["customers.read", "Read customers"],
+    ["customers.write", "Create and update customers"],
   ];
 
   for (const [code, name] of permissions) {

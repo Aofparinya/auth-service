@@ -19,4 +19,4 @@ RUN npm ci --omit=dev \
     && npm cache clean --force
 COPY --from=build /app/dist ./dist
 EXPOSE 3001
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed && node dist/main.js"]
