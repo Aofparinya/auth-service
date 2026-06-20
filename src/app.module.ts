@@ -29,6 +29,7 @@ import { RedisModule } from "./shared/redis/redis.module";
           .integer()
           .positive()
           .default(604800),
+        JWT_SERVICE_TTL_SECONDS: Joi.number().integer().positive().default(300),
       }),
     }),
     PrismaModule,

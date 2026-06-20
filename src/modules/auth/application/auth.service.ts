@@ -44,6 +44,7 @@ interface LoginContext {
 export class AuthService {
   private readonly accessTtl: number;
   private readonly refreshTtl: number;
+  private readonly serviceTtl: number;
   private readonly accessSecret: string;
   private readonly refreshSecret: string;
 
@@ -55,6 +56,7 @@ export class AuthService {
   ) {
     this.accessTtl = config.get<number>("JWT_ACCESS_TTL_SECONDS", 900);
     this.refreshTtl = config.get<number>("JWT_REFRESH_TTL_SECONDS", 604800);
+    this.serviceTtl = config.get<number>("JWT_SERVICE_TTL_SECONDS", 300);
     this.accessSecret = config.getOrThrow<string>("JWT_ACCESS_SECRET");
     this.refreshSecret = config.getOrThrow<string>("JWT_REFRESH_SECRET");
   }
@@ -174,6 +176,9 @@ export class AuthService {
       const payload = await this.jwt.verifyAsync<RequestUser>(token, {
         secret: this.accessSecret,
       });
+      if (payload.type === "service") {
+        return payload;
+      }
       if (
         payload.type !== "access" ||
         !(await this.sessions.exists(payload.sessionId))
@@ -184,6 +189,36 @@ export class AuthService {
     } catch {
       throw new UnauthorizedException("Invalid access token");
     }
+  }
+
+  async issueServiceToken(
+    clientId: string,
+    clientSecret: string,
+  ): Promise<{ accessToken: string; expiresIn: number }> {
+    const client = await this.prisma.serviceClient.findUnique({
+      where: { clientId: clientId.trim() },
+    });
+    const valid =
+      client?.isActive === true &&
+      (await argon2.verify(client.secretHash, clientSecret).catch(() => false));
+    if (!client || !valid) {
+      throw new UnauthorizedException("Invalid service credentials");
+    }
+    const claims: AuthenticatedUser = {
+      sub: client.id,
+      email: `${client.clientId}@service.local`,
+      roles: ["SERVICE"],
+      permissions: client.permissions,
+      sessionId: "",
+      type: "service",
+    };
+    return {
+      accessToken: await this.jwt.signAsync(claims, {
+        secret: this.accessSecret,
+        expiresIn: this.serviceTtl,
+      }),
+      expiresIn: this.serviceTtl,
+    };
   }
 
   async getCurrentUser(userId: string) {

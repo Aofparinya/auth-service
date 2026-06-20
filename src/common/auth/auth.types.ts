@@ -1,4 +1,4 @@
-export type TokenType = "access" | "refresh";
+export type TokenType = "access" | "refresh" | "service";
 
 export interface AuthenticatedUser {
   sub: string;

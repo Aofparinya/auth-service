@@ -87,3 +87,17 @@ model LoginHistory {
   @@map("login_history")
   @@schema("auth")
 }
+
+model ServiceClient {
+  id          String   @id @default(uuid()) @db.Uuid
+  clientId    String   @unique @map("client_id")
+  name        String
+  secretHash  String   @map("secret_hash")
+  permissions String[] @default([])
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("service_clients")
+  @@schema("auth")
+}

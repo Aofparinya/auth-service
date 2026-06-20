@@ -35,3 +35,14 @@ export class ValidateTokenDto {
   @IsString()
   token!: string;
 }
+
+export class ServiceTokenDto {
+  @ApiProperty({ example: "order-service" })
+  @IsString()
+  clientId!: string;
+
+  @ApiProperty()
+  @IsString()
+  @MinLength(16)
+  clientSecret!: string;
+}

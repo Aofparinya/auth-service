@@ -18,6 +18,7 @@ import {
   LogoutDto,
   RefreshTokenDto,
   RegisterDto,
+  ServiceTokenDto,
   ValidateTokenDto,
 } from "./dto/auth.dto";
 
@@ -67,6 +68,13 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   validate(@Body() dto: ValidateTokenDto) {
     return this.auth.validateToken(dto.token);
+  }
+
+  @Public()
+  @Post("service-token")
+  @HttpCode(HttpStatus.OK)
+  serviceToken(@Body() dto: ServiceTokenDto) {
+    return this.auth.issueServiceToken(dto.clientId, dto.clientSecret);
   }
 
   @Get("me")

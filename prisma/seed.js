@@ -16,6 +16,13 @@ async function main() {
     ["catalog.write", "Create and update catalog data"],
     ["inventory.read", "Read inventory data"],
     ["inventory.write", "Adjust inventory and manage reservations"],
+    ["orders.read", "Read orders"],
+    ["orders.write", "Create and manage orders"],
+    ["payments.read", "Read payments"],
+    ["payments.write", "Create, capture and void payments"],
+    ["invoices.read", "Read invoices"],
+    ["refunds.read", "Read refunds"],
+    ["refunds.write", "Create refunds"],
   ];
 
   for (const [code, name] of permissions) {
@@ -83,6 +90,37 @@ async function main() {
       firstName: "Platform",
       lastName: "Administrator",
       userRoles: { create: { roleId: adminRole.id } },
+    },
+  });
+
+  const serviceClientId =
+    process.env.ORDER_SERVICE_CLIENT_ID ?? "order-service";
+  const serviceClientSecret =
+    process.env.ORDER_SERVICE_CLIENT_SECRET ??
+    "development-order-service-secret-change-me";
+  await prisma.serviceClient.upsert({
+    where: { clientId: serviceClientId },
+    update: {
+      name: "Order Service",
+      secretHash: await argon2.hash(serviceClientSecret),
+      permissions: [
+        "customers.read",
+        "catalog.read",
+        "inventory.read",
+        "inventory.write",
+      ],
+      isActive: true,
+    },
+    create: {
+      clientId: serviceClientId,
+      name: "Order Service",
+      secretHash: await argon2.hash(serviceClientSecret),
+      permissions: [
+        "customers.read",
+        "catalog.read",
+        "inventory.read",
+        "inventory.write",
+      ],
     },
   });
 }
