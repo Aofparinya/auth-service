@@ -171,6 +171,7 @@ async function main() {
         "payments.read",
         "payments.write",
         "storage.read",
+        "common.read",
       ],
     },
     {
